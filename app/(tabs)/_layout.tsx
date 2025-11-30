@@ -1,8 +1,21 @@
+import { useNotifications } from '@/contexts/NotificationContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function TabLayout() {
+  const { unreadCount } = useNotifications();
+
+  const TabBarBadge = ({ count }: { count: number }) => {
+    if (count === 0) return null;
+    return (
+      <View style={tabStyles.badge}>
+        <Text style={tabStyles.badgeText}>{count > 99 ? '99+' : count}</Text>
+      </View>
+    );
+  };
+
   return (
     <Tabs
       screenOptions={{
@@ -12,8 +25,8 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E4E7EB',
-          height: 110,
-          paddingBottom: 70,
+          height: 100,
+          paddingBottom: 60,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
@@ -48,12 +61,16 @@ export default function TabLayout() {
         options={{
           title: 'Posted',
           headerShown: false,
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
-              name={focused ? 'car-sport' : 'car-sport-outline'} 
-              size={24} 
-              color={color} 
-            />
+            <View>
+              <Ionicons 
+                name={focused ? 'car-sport' : 'car-sport-outline'} 
+                size={24} 
+                color={color} 
+              />
+              {unreadCount > 0 && <TabBarBadge count={unreadCount} />}
+            </View>
           ),
         }}
       />
@@ -88,11 +105,27 @@ export default function TabLayout() {
       <Tabs.Screen name="two" options={{ href: null }} />
       <Tabs.Screen name="myRide/getRides" options={{ href: null }} />
       <Tabs.Screen name="myRide/givenRides" options={{ href: null }} />
-            <Tabs.Screen name="myRide/index" options={{ href: null }} />
-
-
-
+      <Tabs.Screen name="myRide/index" options={{ href: null }} />
     </Tabs>
-
   );
 }
+
+const tabStyles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -10,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+});

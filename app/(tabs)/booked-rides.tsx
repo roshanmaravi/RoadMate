@@ -77,6 +77,51 @@ export default function BookedRidesScreen() {
     fetchMyBookings();
   }, [userData?.userId]);
 
+  const confirmCancelBooking = (bookingId: number, from: string, to: string) => {
+    Alert.alert(
+      "Cancel Booking",
+      `Are you sure you want to cancel your booking for ${from} to ${to}?`,
+      [
+        { text: "No", style: "cancel" },
+        {
+          text: "Yes, Cancel",
+          style: "destructive",
+          onPress: () => cancelBooking(bookingId),
+        },
+      ]
+    );
+  };
+
+  const cancelBooking = async (bookingId: number) => {
+    try {
+      const response = await fetch(
+        "https://domainapi.shop/g/backend/ride/cancel-booking.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            bookingId,
+            userId: userData?.userId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        Alert.alert("Success", "Booking cancelled successfully");
+        fetchMyBookings();
+      } else {
+        Alert.alert("Error", data.message || "Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      Alert.alert("Error", "Failed to connect to server");
+    }
+  };
+
   const getVehicleIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case "bike":
@@ -195,16 +240,27 @@ export default function BookedRidesScreen() {
       >
         {bookings.map((booking) => (
           <View key={booking.bookingId} style={styles.card}>
-            {/* Status Badge */}
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: getStatusColor(booking.bookingStatus) },
-              ]}
-            >
-              <Text style={styles.statusText}>
-                {getStatusText(booking.bookingStatus)}
-              </Text>
+            {/* Status Badge and Cancel Button */}
+            <View style={styles.topActions}>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusColor(booking.bookingStatus) },
+                ]}
+              >
+                <Text style={styles.statusText}>
+                  {getStatusText(booking.bookingStatus)}
+                </Text>
+              </View>
+
+              {(booking.bookingStatus === "pending" || booking.bookingStatus === "confirmed") && (
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => confirmCancelBooking(booking.bookingId, booking.from, booking.to)}
+                >
+                  <Ionicons name="close-circle" size={24} color="#F44336" />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Ride Details */}
@@ -367,13 +423,24 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  topActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
   statusBadge: {
-    position: "absolute",
-    top: 16,
-    right: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
+  },
+  cancelButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#FFEBEE",
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusText: {
     color: "white",
@@ -382,7 +449,6 @@ const styles = StyleSheet.create({
   },
   routeContainer: {
     marginBottom: 16,
-    paddingRight: 80,
   },
   locationRow: {
     flexDirection: "row",

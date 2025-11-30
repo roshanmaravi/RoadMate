@@ -14,13 +14,22 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.roshanmaravi.RoadMate"
     },
     "android": {
+      "package": "com.roshanmaravi.RoadMate",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": [
+        "NOTIFICATIONS",
+        "VIBRATE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -30,10 +39,31 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#667EEA",
+          "defaultChannel": "default"
+        }
+      ]
     ],
+    "notification": {
+      "icon": "./assets/images/icon.png",
+      "color": "#667EEA",
+      "androidMode": "default",
+      "androidCollapsedTitle": "{{unread_count}} new notifications"
+    },
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0a63a6f8-b8c9-4018-af93-4b99a0aff2d9"
+      }
+    },
+    "owner": "roshanmaravi"
   }
 }

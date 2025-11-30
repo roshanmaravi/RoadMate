@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Modal,
   RefreshControl,
   ScrollView,
@@ -223,8 +224,12 @@ export default function HomeScreen() {
       >
         <View style={styles.headerTop}>
           <View style={styles.logoContainer}>
-            <Ionicons name="car-sport" size={28} color="#FFFFFF" />
-            <Text style={styles.logoText}>RoadMate</Text>
+            <Image 
+              source={require('@/assets/images/icon.png')} 
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            {/* <Text style={styles.logoText}>RoadMate</Text> */}
           </View>
           <TouchableOpacity 
             style={styles.profileButton}
@@ -633,7 +638,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   logoText: {
     fontSize: 28,

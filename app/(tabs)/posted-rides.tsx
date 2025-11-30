@@ -130,6 +130,51 @@ export default function PostedRidesScreen() {
     );
   };
 
+  const confirmDeleteRide = (rideId: number, from: string, to: string) => {
+    Alert.alert(
+      "Delete Ride",
+      `Are you sure you want to delete your ride from ${from} to ${to}? This will also cancel all bookings.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteRide(rideId),
+        },
+      ]
+    );
+  };
+
+  const deleteRide = async (rideId: number) => {
+    try {
+      const response = await fetch(
+        "https://domainapi.shop/g/backend/ride/delete-ride.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rideId,
+            userId: userData?.userId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        Alert.alert("Success", "Ride deleted successfully");
+        fetchMyPostedRides();
+      } else {
+        Alert.alert("Error", data.message || "Failed to delete ride");
+      }
+    } catch (error) {
+      console.error("Error deleting ride:", error);
+      Alert.alert("Error", "Failed to connect to server");
+    }
+  };
+
   const confirmCancelBooking = (bookingId: number, passengerName: string) => {
     Alert.alert(
       "Cancel Booking",
@@ -264,9 +309,17 @@ export default function PostedRidesScreen() {
               <Text style={styles.rideTitle}>
                 {ride.from} → {ride.to}
               </Text>
-              <View style={styles.bookingBadge}>
-                <Ionicons name="people" size={16} color="#667EEA" />
-                <Text style={styles.bookingCount}>{ride.bookingCount}</Text>
+              <View style={styles.headerRight}>
+                <View style={styles.bookingBadge}>
+                  <Ionicons name="people" size={16} color="#667EEA" />
+                  <Text style={styles.bookingCount}>{ride.bookingCount}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => confirmDeleteRide(ride.id, ride.from, ride.to)}
+                >
+                  <Ionicons name="trash-outline" size={20} color="#F44336" />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -520,6 +573,11 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
     flex: 1,
   },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   bookingBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -527,6 +585,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+  },
+  deleteButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#FFEBEE",
+    justifyContent: "center",
+    alignItems: "center",
   },
   bookingCount: {
     marginLeft: 4,
