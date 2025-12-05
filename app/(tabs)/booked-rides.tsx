@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -35,6 +37,7 @@ interface Booking {
 
 export default function BookedRidesScreen() {
   const { userData } = useAuth();
+  const { refreshNotifications } = useNotifications();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -112,7 +115,9 @@ export default function BookedRidesScreen() {
 
       if (data.success) {
         Alert.alert("Success", "Booking cancelled successfully");
+        // Refresh both bookings and notifications
         fetchMyBookings();
+        refreshNotifications();
       } else {
         Alert.alert("Error", data.message || "Failed to cancel booking");
       }
@@ -211,8 +216,24 @@ export default function BookedRidesScreen() {
             <Ionicons name="bookmarks-outline" size={80} color="#667EEA" />
             <Text style={styles.emptyText}>No rides booked yet</Text>
             <Text style={styles.emptySubtext}>
-              Your booked rides will appear here
+              Find and book rides to your destination
             </Text>
+            
+            {/* Find Rides Button */}
+            <TouchableOpacity
+              style={styles.findRidesButton}
+              onPress={() => router.push('/(tabs)')}
+            >
+              <LinearGradient
+                colors={['#667EEA', '#764BA2']}
+                style={styles.findRidesGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Ionicons name="search" size={24} color="white" />
+                <Text style={styles.findRidesButtonText}>Find Rides</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </LinearGradient>
         </ScrollView>
       </View>
@@ -393,6 +414,29 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     width: '100%',
+  },
+  findRidesButton: {
+    marginTop: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#667EEA',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  findRidesGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    gap: 8,
+  },
+  findRidesButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
   },
   loadingText: {
     marginTop: 10,

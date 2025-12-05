@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -44,6 +46,7 @@ interface PostedRide {
 
 export default function PostedRidesScreen() {
   const { userData } = useAuth();
+  const { refreshNotifications } = useNotifications();
   const [rides, setRides] = useState<PostedRide[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -51,8 +54,37 @@ export default function PostedRidesScreen() {
   useEffect(() => {
     if (userData?.userId) {
       fetchMyPostedRides();
+      // Mark notifications as read when viewing this screen
+      markNotificationsAsRead();
     }
   }, [userData?.userId]);
+
+  const markNotificationsAsRead = async () => {
+    try {
+      await refreshNotifications();
+      // Small delay to ensure notifications are loaded
+      setTimeout(async () => {
+        const response = await fetch(
+          "https://domainapi.shop/g/backend/notification/mark-as-read.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userData?.userId,
+            }),
+          }
+        );
+        
+        if (response.ok) {
+          refreshNotifications();
+        }
+      }, 500);
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+    }
+  };
 
   const fetchMyPostedRides = async () => {
     if (!userData?.userId) {
@@ -106,7 +138,9 @@ export default function PostedRidesScreen() {
 
       if (data.success) {
         Alert.alert("Success", data.message);
+        // Refresh both rides and notifications
         fetchMyPostedRides();
+        refreshNotifications();
       } else {
         Alert.alert("Error", data.message || "Failed to update booking");
       }
@@ -165,7 +199,9 @@ export default function PostedRidesScreen() {
 
       if (data.success) {
         Alert.alert("Success", "Ride deleted successfully");
+        // Refresh both rides and notifications
         fetchMyPostedRides();
+        refreshNotifications();
       } else {
         Alert.alert("Error", data.message || "Failed to delete ride");
       }
@@ -275,8 +311,24 @@ export default function PostedRidesScreen() {
             <Ionicons name="car-sport-outline" size={80} color="#667EEA" />
             <Text style={styles.emptyText}>No rides posted yet</Text>
             <Text style={styles.emptySubtext}>
-              Your posted rides will appear here
+              Start earning by offering rides to passengers
             </Text>
+            
+            {/* Post Ride Button */}
+            <TouchableOpacity
+              style={styles.postRideButton}
+              onPress={() => router.push('/give-ride')}
+            >
+              <LinearGradient
+                colors={['#667EEA', '#764BA2']}
+                style={styles.postRideGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Ionicons name="add-circle" size={24} color="white" />
+                <Text style={styles.postRideButtonText}>Post a Ride</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </LinearGradient>
         </ScrollView>
       </View>
@@ -531,6 +583,29 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     width: '100%',
+  },
+  postRideButton: {
+    marginTop: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#667EEA',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  postRideGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    gap: 8,
+  },
+  postRideButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
   },
   loadingText: {
     marginTop: 10,

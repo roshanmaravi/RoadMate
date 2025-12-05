@@ -68,7 +68,7 @@ export default function ProfileScreen() {
             <View style={styles.userInfoChips}>
               <View style={styles.infoChip}>
                 <Ionicons name="call" size={12} color="#667EEA" />
-                <Text style={styles.infoChipText}>{userData?.mobile || 'Not set'}</Text>
+                <Text style={styles.infoChipText}>{userData?.phone || 'Not set'}</Text>
               </View>
               <View style={styles.infoChip}>
                 <Ionicons name="location" size={12} color="#667EEA" />
@@ -133,7 +133,7 @@ export default function ProfileScreen() {
               <Ionicons name="call-outline" size={18} color="#667EEA" />
               <Text style={styles.detailLabel}>Phone</Text>
             </View>
-            <Text style={styles.detailValue}>{userData?.mobile || 'N/A'}</Text>
+            <Text style={styles.detailValue}>{userData?.phone || 'N/A'}</Text>
           </View>
           
           <View style={styles.detailRow}>
@@ -159,7 +159,7 @@ export default function ProfileScreen() {
           
           <TouchableOpacity 
             style={styles.menuItem}
-            onPress={() => router.push('/posted-rides')}
+            onPress={() => router.push('/(tabs)/posted-rides')}
             activeOpacity={0.7}
           >
             <View style={styles.menuLeft}>
@@ -179,7 +179,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity 
             style={styles.menuItem}
-            onPress={() => router.push('/booked-rides')}
+            onPress={() => router.push('/(tabs)/booked-rides')}
             activeOpacity={0.7}
           >
             <View style={styles.menuLeft}>
@@ -200,7 +200,7 @@ export default function ProfileScreen() {
 
         {/* Help & Support */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help & Support</Text>
+          <Text style={styles.sectionTitle}>Help & Supportrrrrr</Text>
           
           <TouchableOpacity 
             style={styles.menuItem}
@@ -244,7 +244,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Settings */}
-        {/* <View style={styles.section}>
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
           
           <TouchableOpacity 
@@ -284,7 +284,7 @@ export default function ProfileScreen() {
             </View>
             <Ionicons name="chevron-forward" size={22} color="#999" />
           </TouchableOpacity>
-        </View> */}
+        </View>
 
         {/* Logout Button */}
         <TouchableOpacity 
